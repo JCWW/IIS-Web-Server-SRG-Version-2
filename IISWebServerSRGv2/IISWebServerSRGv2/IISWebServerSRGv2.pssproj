@@ -31,6 +31,7 @@
     <Compile Include="IISWebServerSRGv2.psd1" />
     <Compile Include="IISWebServerSRGv2.psm1" />
     <Compile Include="IISWebServerSRGv2.tests.ps1" />
+    <Compile Include="InstallIISWebServerSRGv2Module.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />
