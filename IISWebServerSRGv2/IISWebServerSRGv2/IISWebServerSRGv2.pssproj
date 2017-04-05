@@ -26,13 +26,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Compile Include="ApplyIISWebServerSRGv2.ps1" />
-    <Compile Include="IISWebServerSRGv2.psd1" />
-    <Compile Include="IISWebServerSRGv2.psm1" />
+    <Folder Include="IISWebServerSRGv2\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IISWebServerSRGv2\ApplyIISWebServerSRGv2.ps1" />
+    <Compile Include="IISWebServerSRGv2\IISWebServerSRGv2.psd1" />
+    <Compile Include="IISWebServerSRGv2\IISWebServerSRGv2.psm1" />
     <Compile Include="IISWebServerSRGv2.tests.ps1" />
-    <Compile Include="InstallIISWebServerSRGv2Module.ps1" />
+    <Compile Include="IISWebServerSRGv2\InstallIISWebServerSRGv2Module.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />

@@ -9,7 +9,7 @@
 
 ## Load WebServerSTIGS Module ##
 #Write-Output "Importing"
-#Import-Module WebServerSTIGS
+#Import-Module IISWebServerSRGv2
 
 ### IIS 7 Server STIGs ###
 

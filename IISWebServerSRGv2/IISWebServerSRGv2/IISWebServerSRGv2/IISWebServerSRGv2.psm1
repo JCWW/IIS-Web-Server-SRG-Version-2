@@ -1,3 +1,72 @@
+function Move-IISDirectory{
+
+	<#
+	.SYNOPSIS
+	Moves the IIS Directory from the OS directory to another drive.
+	.DESCRIPTION
+	.PARAMETER Drive
+	The new drive to moved the IIS directory to. 
+	.EXAMPLE
+	Move-IISDirectory
+	.EXAMPLE
+	Move-IISDirectory -Drive D:
+	.COMPONENT
+	IIS 7.0 Web Site
+	.LINK
+	http://iase.disa.mil/stigs/app-security/web-servers/Pages/index.aspx
+	.LINK
+	http://iasecontent.disa.mil/stigs/zip/Oct2015/U_Web_Server_V2R2_SRG.zip
+	.LINK
+	https://www.stigviewer.com/stig/web_server_security_requirements_guide/2014-11-17/finding/V-40791
+	#>
+	 
+	[CmdletBinding()]
+	param(
+		[string]$Drive
+	)
+	 
+	Write-Output "PLEASE BE AWARE: SERVICING (I.E. HOTFIXES AND SERVICE PACKS) WILL STILL REPLACE FILES"
+	Write-Output "IN THE ORIGINAL DIRECTORIES. THE LIKELIHOOD THAT FILES IN THE INETPUB DIRECTORIES HAVE"
+	Write-Output "TO BE REPLACED BY SERVICING IS LOW BUT FOR THIS REASON DELETING THE ORIGINAL DIRECTORIES"
+	Write-Output "IS NOT POSSIBLE."
+	 
+	$backup = "iisBackup_" + (Get-Date -Format ddMMyy)
+	Write-Output "Backing up ApplicaionHost.config"
+
+	C:\Windows\System32\inetsrv\appcmd.exe add backup $backup
+	
+	Write-Output "Stop all IIS Services"
+	iisreset /stop
+
+	Write-Output "Copy INETPUB DRIVE"
+ 
+	$systemDrive = $env:SystemDrive
+	$basePath = Join-Path -Path $systemDrive -ChildPath "Inetpub"
+	$newPath =Join-Path -Path $Drive -ChildPath "test\inetpub\"
+   
+	if (!(Test-Path $newPath)) {
+	   
+		Write-Output "Copying INETPUB DRIVE"
+
+		xcopy $basePath $newPath /O /E /I /Q
+		
+		Write-Output "Finished Copying INETPUB"
+	}
+ 
+	Write-Output "Move AppPool isolation directory" 
+
+	#New-Item 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Server' -Force | Out-Null
+	
+	New-ItemProperty -path 'HKLM\System\CurrentControlSet\Services\WAS\Parameters' -name 'ConfigIsolationPath' -value '$newPath' -PropertyType 'REG_SZ' -Force | Out-Null
+
+
+
+	#New-Item 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Server' -Force | Out-Null
+	#New-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Server' -name 'Enabled' -value '0xffffffff' -PropertyType 'DWord' -Force | Out-Null
+
+
+}
+
 function Set-LogDataFields {
 	
 	<#
@@ -265,7 +334,7 @@ function Set-V41702 {
 
 	if($feature.Installed){
 	  
-	UnInstall-WindowsFeature -Name Web-Dav-Publishing -whatif
+		UnInstall-WindowsFeature -Name Web-Dav-Publishing -whatif
 
 	}
 }
@@ -592,12 +661,13 @@ function Set-V56017 {
 	#>
 	
 	# Add and Enable TLS 1.2 for client and server SCHANNEL communications
-	New-Item 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Server' -Force | Out-Null
-	New-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Server' -name 'Enabled' -value '0xffffffff' -PropertyType 'DWord' -Force | Out-Null
-	New-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Server' -name 'DisabledByDefault' -value 0 -PropertyType 'DWord' -Force | Out-Null
-	New-Item 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Client' -Force | Out-Null
-	New-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Client' -name 'Enabled' -value '0xffffffff' -PropertyType 'DWord' -Force | Out-Null
-	New-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Client' -name 'DisabledByDefault' -value 0 -PropertyType 'DWord' -Force | Out-Null
+	#New-Item 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Server' -Force | Out-Null
+	#New-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Server' -name 'Enabled' -value '0xffffffff' -PropertyType 'DWord' -Force | Out-Null
+	#New-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Server' -name 'DisabledByDefault' -value 0 -PropertyType 'DWord' -Force | Out-Null
+	#New-Item 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Client' -Force | Out-Null
+	#New-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Client' -name 'Enabled' -value '0xffffffff' -PropertyType 'DWord' -Force | Out-Null
+	#New-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Client' -name 'DisabledByDefault' -value 0 -PropertyType 'DWord' -Force | Out-Null
+	
 	Write-Host 'TLS 1.2 has been enabled.'
 
 }
