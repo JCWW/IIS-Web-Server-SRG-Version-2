@@ -28,6 +28,7 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
+    <Compile Include="ApplyIISWebServerSRGv2.ps1" />
     <Compile Include="IISWebServerSRGv2.psd1" />
     <Compile Include="IISWebServerSRGv2.psm1" />
     <Compile Include="IISWebServerSRGv2.tests.ps1" />
