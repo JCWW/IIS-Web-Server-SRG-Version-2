@@ -1,4 +1,14 @@
-function Move-IISDirectory{
+function BackUp-WebConfiguration{
+ 
+	Write-Output "Executing GISA-BackupIIS" 
+	$backupName = "iisBackup_" + (Get-Date -Format ddMMyy)
+	$backupDir = $env:windir+'\system32\inetsrv\backup'
+	$backupFolder =Join-Path -Path $backupDir -ChildPath $backupName
+	Backup-WebConfiguration -Name $backupName
+	Write-Output "IIS has been backed up at:" $backupFolder
+ }
+ 
+function Move-IISDirectory {
 
 	<#
 	.SYNOPSIS
@@ -30,6 +40,11 @@ function Move-IISDirectory{
 	Write-Output "TO BE REPLACED BY SERVICING IS LOW BUT FOR THIS REASON DELETING THE ORIGINAL DIRECTORIES"
 	Write-Output "IS NOT POSSIBLE."
 	 
+
+
+	Write-Output "`n ----- Moves IIS off of the system drive and onto another drive -----"
+
+
 	$backup = "iisBackup_" + (Get-Date -Format ddMMyy)
 	Write-Output "Backing up ApplicaionHost.config"
 
@@ -96,7 +111,17 @@ function Set-LogDataFields {
 	.LINK
 	https://www.stigviewer.com/stig/iis_7.0_web_site/2015-06-01/finding/V-41620
 	#>
-	
+ 
+	Write-Output "`n ----- Applying V-41600 from Web Server Security Requirements Guide -----"
+	Write-Output "`n ----- Applying V-41612 from Web Server Security Requirements Guide -----"
+	Write-Output "`n ----- Applying V-41613 from Web Server Security Requirements Guide -----"
+	Write-Output "`n ----- Applying V-41614 from Web Server Security Requirements Guide -----"
+	Write-Output "`n ----- Applying V-41615 from Web Server Security Requirements Guide -----"
+	Write-Output "`n ----- Applying V-41617 from Web Server Security Requirements Guide -----"
+	Write-Output "`n ----- Applying V-41620 from Web Server Security Requirements Guide -----"
+	Write-Output "`n ----- Applying V-56021 from Web Server Security Requirements Guide -----"
+	 
+
 	Set-WebConfigurationProperty "/system.applicationHost/sites/siteDefaults" -name logfile.logExtFileFlags -value "Date,Time,ClientIP,UserName,ServerIP,Method,UriStem,UriQuery,HttpStatus,Win32Status,TimeTaken,ServerPort,UserAgent,Referer,HttpSubStatus"
 	
 	Write-Output "`Configured IIS logs per STIG guidelines"
@@ -131,6 +156,8 @@ function Set-V40791 {
 		[long]$Limit = 1000
 	)
 
+	Write-Output "`n ----- Applying V-40791 from Web Server Security Requirements Guide -----"
+
 	$serverConfiguration = "/system.applicationHost/sites/*"
 
 	$applicationHosts = Get-WebConfiguration -filter $serverConfiguration
@@ -151,7 +178,7 @@ function Set-V40792 {
 	.SYNOPSIS
 	Applies finding V-40792 ("The web server must perform server-side session management.") from the WebServer STIG.
 	.DESCRIPTION
-	For every IIS Site, configures the maximum number of allowed connections    
+	Configures the web server to perform server-side session management.  
 	.EXAMPLE
 	Set-V40792  
 	.COMPONENT
@@ -164,6 +191,8 @@ function Set-V40792 {
 	https://www.stigviewer.com/stig/web_server_security_requirements_guide/2015-08-28/finding/V-40792
 	#>
  
+	Write-Output "`n ----- Applying V-40792 from Web Server Security Requirements Guide -----"
+	
 	$serverConfiguration = "/system.web/sessionState"
 
 	Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT'  -filter $serverConfiguration -name "mode" -value "InProc"
@@ -180,7 +209,7 @@ function Set-V41670 {
 	.PARAMETER Path
 	Optional. Sets the path to apply the STIG configuration too.
 	.EXAMPLE
-	Set-V41670
+	Set-V41670 -Path "D:\inetpub\logs"
 	.COMPONENT
 	IIS Web Server
 	.LINK
@@ -193,14 +222,17 @@ function Set-V41670 {
 	 
 	[CmdletBinding()]
 	param(
-		[string]$Path = "D:\inetpub"
+		[string]$Path = "D:\inetpub\logs"
 	)
 	 
+
+	Write-Output "`n ----- Applying V-41670 from Web Server Security Requirements Guide -----"
+
 	Remove-Inheritance $Path
  
 	Remove-NTFSPermissions $Path "Creator owner" "Read,Modify"
  }
-
+ 
 function Set-V41671 {
  
 	<#
@@ -227,6 +259,8 @@ function Set-V41671 {
 		[string]$Path = "D:\inetpub"
 	)
 	 
+	Write-Output "`n ----- Applying V-41671 from Web Server Security Requirements Guide -----"
+
 	Remove-Inheritance $Path
  
 	Remove-NTFSPermissions $Path "Creator owner" "Read,Modify"
@@ -257,11 +291,37 @@ function Set-V41672 {
 	param(
 		[string]$Path = "D:\inetpub"
 	)
+
+	Write-Output "`n ----- Applying V-41672 from Web Server Security Requirements Guide -----"
 	 
 	Remove-Inheritance $Path
  
 	Remove-NTFSPermissions $Path "Creator owner" "Read,Modify"
  }
+
+function Set-V41695 {
+
+	<#
+	.SYNOPSIS
+	Applies finding V-41695 ("The web server must provide install options to exclude the installation of documentation, sample code, example applications, and tutorials.") from the WebServer STIG.
+	.DESCRIPTION
+	Use the web server uninstall facility or manually remove any documentation, sample code, example applications, and tutorials.
+	.EXAMPLE
+	Set-V41695
+	.COMPONENT
+	IIS Web Server
+	.LINK
+	http://iase.disa.mil/stigs/app-security/web-servers/Pages/index.aspx
+	.LINK
+	http://iasecontent.disa.mil/stigs/zip/Oct2015/U_Web_Server_V2R2_SRG.zip
+	.LINK
+	https://www.stigviewer.com/stig/web_server_security_requirements_guide/2015-08-28/finding/V-41695
+	#>
+
+	Write-Output "`n ----- Applying V-41695 from Web Server Security Requirements Guide -----"
+	Write-Output "`n ----- Deletes the Sample/Admin Code -----"
+ 
+}
 
 function Set-V41699 {
 	
@@ -282,12 +342,14 @@ function Set-V41699 {
 	https://www.stigviewer.com/stig/web_server_security_requirements_guide/2015-08-28/finding/V-41699
 	#>
 
+	Write-Output "`n ----- Applying V-41699 from Web Server Security Requirements Guide -----"
+
 	Remove-ShellMIMEType
   }
    
 function Set-V41701 {
 
- <#
+   <#
 	.SYNOPSIS
 	Applies finding V-V41701 ("The web server must have resource mappings set to disable the serving of certain file types.") from the WebServer STIG.
 	.DESCRIPTION
@@ -304,6 +366,8 @@ function Set-V41701 {
 	https://www.stigviewer.com/stig/web_server_security_requirements_guide/2015-08-28/finding/V-41701
 	#>
 	 
+   Write-Output "`n ----- Applying V-41701 from Web Server Security Requirements Guide -----"
+
    Set-DoubleEscapingURLs
 
    Set-HighBitCharacters
@@ -329,13 +393,14 @@ function Set-V41702 {
 	.LINK
 	https://www.stigviewer.com/stig/web_server_security_requirements_guide/2015-08-28/finding/V-41702
 	#>
-	 
+	
+	Write-Output "`n ----- Applying V-41702 from Web Server Security Requirements Guide -----"
+ 
 	$feature = get-windowsfeature web-dav-publishing
 
 	if($feature.Installed){
 	  
 		UnInstall-WindowsFeature -Name Web-Dav-Publishing -whatif
-
 	}
 }
 
@@ -368,6 +433,9 @@ function Set-V41833 {
 		[long]$Limit = 1000
 	)
 
+
+	Write-Output "`n ----- Applying V-41833 from Web Server Security Requirements Guide -----"
+	 
 	$serverConfiguration = "/system.applicationHost/sites/*"
 
 	$applicationHosts = Get-WebConfiguration -filter $serverConfiguration
@@ -378,6 +446,33 @@ function Set-V41833 {
 		
 		Set-WebConfigurationProperty -Filter $serverConfiguration -name Limits -Value @{MaxConnections=$limit}
 	}
+}
+
+function Set-V41852 {
+<#
+	.SYNOPSIS
+	Applies finding V-41852 ("The web server must limit the character set used for data entry.") from the WebServer STIG.
+	.DESCRIPTION
+	Configure the web server to only accept the character sets expected by the hosted applications.
+	.PARAMETER Limit
+	Optional. Configures the maximum number of connections allowed for all IIS sites. If not specified, the default value is the maximum value of 4,294,967,294.
+	.EXAMPLE
+	Set-V41852
+	.COMPONENT
+	IIS Web Server
+	.LINK
+	http://iase.disa.mil/stigs/app-security/web-servers/Pages/index.aspx
+	.LINK
+	http://iasecontent.disa.mil/stigs/zip/Oct2015/U_Web_Server_V2R2_SRG.zip
+	.LINK
+	https://www.stigviewer.com/stig/web_server_security_requirements_guide/2014-11-17/finding/V-41852
+	#>
+
+
+	Write-Output "`n ----- Applying V-41852 from Web Server Security Requirements Guide -----"
+
+	Set-HighBitCharacters
+
 }
 
 function Set-V41854 {
@@ -398,6 +493,8 @@ function Set-V41854 {
 	.LINK
 	  https://www.stigviewer.com/stig/web_server_security_requirements_guide/2014-11-17/finding/V-41854
 	#>
+
+	Write-Output "`n ----- Applying V-41854 from Web Server Security Requirements Guide -----"
 
 	Set-AlternateHostName
 }
@@ -420,6 +517,8 @@ function Set-V41855 {
 	.LINK
 	  https://www.stigviewer.com/stig/web_server_security_requirements_guide/2014-11-17/finding/V-41855
 	#>
+
+	Write-Output "`n ----- Applying V-41855 from Web Server Security Requirements Guide -----"
 	  
 	#Disable Server Tracing#
 	C:\Windows\System32\inetsrv\appcmd.exe configure trace /disable
@@ -435,6 +534,36 @@ function Set-V41855 {
 		}
 	  
 	}
+}
+ 
+function Set-V41695 {
+
+   <#
+	.SYNOPSIS
+	Applies finding V-41695 ("The web server must provide install options to exclude the installation of documentation, sample code, example applications, and tutorials.") from the Web Server STIG.
+	.DESCRIPTION
+	Use the web server uninstall facility or manually remove any documentation, sample code, example applications, and tutorials.
+	.PARAMETER IisRootFolder
+	Optional. Sets the path to apply the STIG configuration too.
+	.EXAMPLE
+	Set-V41672 -IisRootFolder D:\inetpub
+	.COMPONENT
+	IIS Web Server
+	.LINK
+	http://iase.disa.mil/stigs/app-security/web-servers/Pages/index.aspx
+	.LINK
+	  http://iasecontent.disa.mil/stigs/zip/Oct2015/U_Web_Server_V2R2_SRG.zip
+	.LINK
+	  https://www.stigviewer.com/stig/web_server_security_requirements_guide/2014-11-17/finding/V-41695
+	#>
+
+	[CmdletBinding()]
+	param(
+		[string]$IisRootFolder = "D:\inetpub"
+	)
+
+	Remove-SampleCode(C:\inetpub)
+	
 }
 
 function Set-V55949 {
@@ -464,6 +593,10 @@ function Set-V55949 {
 		[long]$Timeout = 20
 	)
 
+
+	Write-Output "`n ----- Applying V-55949 from Web Server Security Requirements Guide -----"
+
+
    $appPools = Get-ChildItem –Path IIS:\AppPools
 
    foreach ($app in $appPools){
@@ -476,7 +609,7 @@ function Set-V55949 {
 
 function Set-V55951 {
 
-<#
+	<#
 	.SYNOPSIS
 	Applies finding V-55951 ("The web server must set an absolute timeout for sessions.") from the Web Server STIG.
 	.DESCRIPTION
@@ -492,6 +625,8 @@ function Set-V55951 {
 	  https://www.stigviewer.com/stig/web_server_security_requirements_guide/2014-11-17/finding/V-55951
 	#>
    
+	Write-Output "`n ----- Applying V-55951 from Web Server Security Requirements Guide -----"
+
 	Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT' -filter "system.web/sessionState" -name "timeout" -value "00:20:00"
 }
  
@@ -513,6 +648,8 @@ function Set-V55997 {
 	  https://www.stigviewer.com/stig/web_server_security_requirements_guide/2014-11-17/finding/V-55997
 	#>
    
+	Write-Output "`n ----- Applying V-55997 from Web Server Security Requirements Guide -----"
+	
 	$applicationPoolsPath = "/system.applicationHost/applicationPools"
 	$applicationPools = Get-WebConfiguration $applicationPoolsPath
 
@@ -529,7 +666,7 @@ function Set-V55997 {
 
 function Set-V56003 {
 
-<#
+	<#
 	.SYNOPSIS
 	Applies finding V-56003 ("The web server must implement required cryptographic protections using cryptographic modules complying with applicable federal laws, Executive Orders, directives, policies, regulations, standards, and guidance when encrypting data that must be compartmentalized.") from the Web Server STIG.
 	.DESCRIPTION
@@ -544,9 +681,10 @@ function Set-V56003 {
 	.LINK
 	  https://www.stigviewer.com/stig/web_server_security_requirements_guide/2014-11-17/finding/V-56003
 	#>
+
+	Write-Output "`n ----- Applying V-56003 from Web Server Security Requirements Guide -----"
 	
 	Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST'  -filter "system.webServer/security/access" -name "sslFlags" -value "Ssl128"
-
 }
 
 function Set-V56007 {
@@ -569,7 +707,8 @@ function Set-V56007 {
 	  https://www.stigviewer.com/stig/web_server_security_requirements_guide/2014-11-17/finding/V-56007
 	#>
 	
-   Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT'  -filter "system.web/sessionState" -name "cookieName" -value "ASP.NET_SessionID"
+	Write-Output "`n ----- Applying V-56007 from Web Server Security Requirements Guide -----"
+	Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT'  -filter "system.web/sessionState" -name "cookieName" -value "ASP.NET_SessionID"
 	
 }
 
@@ -617,6 +756,7 @@ function Set-V56011 {
 	SAME AS Set-V56003
 	#>
 	
+	Write-Output "`n ----- Applying V-56011 from Web Server Security Requirements Guide -----"
 	 Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST'  -filter "system.webServer/security/access" -name "sslFlags" -value "Ssl128"
 	
 }
@@ -639,6 +779,7 @@ function Set-V56015 {
 	https://www.stigviewer.com/stig/web_server_security_requirements_guide/2014-11-17/finding/V-56015
 	#>
 	
+	Write-Output "`n ----- Applying V-56015 from Web Server Security Requirements Guide -----"
 	 Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST'  -filter "system.webServer/security/access" -name "sslFlags" -value "Ssl128"
 }
 
@@ -690,6 +831,7 @@ function Set-V56023 {
 	https://www.stigviewer.com/stig/web_server_security_requirements_guide/2014-11-17/finding/V-56023
 	#>
 	
+	Write-Output "`n ----- Applying V-56023 from Web Server Security Requirements Guide -----"
 	Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT'  -filter "system.web/machineKey" -name "validation" -value "SHA1"
 }
 
@@ -711,6 +853,7 @@ function Set-V56025 {
 	https://www.stigviewer.com/stig/web_server_security_requirements_guide/2014-11-17/finding/V-56025
 	#>
 	
+Write-Output "`n ----- Applying V-56025 from Web Server Security Requirements Guide -----"
 	Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT'  -filter "system.web/machineKey" -name "decryptionKey" -value "AutoGenerate,IsolateApps"
 	Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT'  -filter "system.web/machineKey" -name "validationKey" -value "AutoGenerate,IsolateApps"
 }
@@ -732,7 +875,8 @@ function Set-V56035 {
 	.LINK
 	https://www.stigviewer.com/stig/web_server_security_requirements_guide/2014-11-17/finding/V-56035
 	#>
-
+	
+	Write-Output "`n ----- Applying V-56035 from Web Server Security Requirements Guide -----"
 	Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST'  -filter "system.webServer/directoryBrowse" -name "enabled" -value "False"
 }
  
@@ -775,15 +919,17 @@ function Set-AlternateHostName {
 	if (!$runtimeConfig.alternateHostName){
 
 		Write-Output "Server is not STIG compliant - alternateHostName is blank"
-		   
+		Write-Output "Setting alternateHostName"
+
 		Set-WebConfigurationProperty -Filter "/system.webServer/serverRuntime" -name alternateHostName -Value $fqdn
+
+		Write-Output "alternateHostName set to: " + $fqdn
 
 	}
 
 	else {
 
 		Write-Output "Server is STIG Compliant - alternateHostName is $runtimeConfig.alternateHostName"
-	
 	}
 
 }
@@ -1033,5 +1179,89 @@ function Remove-ShellMIMEType {
 	  
 	}      
 } 
+
+}
+
+function Remove-SampleCode($iisRootFolder) {
+
+	#$iisRootFolder = "C:\inetpub"
+	$adminScriptsFolder = Join-Path -Path $iisRootFolder -Childpath "AdminScripts"
+	$0409Folder = Join-Path -Path $adminScriptsFolder -Childpath "0409"
+	$sampleFolder = Join-Path -Path $iisRootFolder -Childpath "scripts\IISSamples"
+	$msadcFolder = "C:\Program Files\Common Files\system\msadc"
+	
+	Set-Location $iisRootFolder
+
+	# Delete AdminScripts folder and subfolders #
+
+	if (Test-Path $adminScriptsFolder) {
+		
+		Write-Output "Not STIG compliant - AdminScripts subfolder found in $iisRootFolder - deleting files and sub-folders"
+		
+		takeown /f AdminScripts /r /d y
+		
+		if (Test-Path $0409Folder) {
+			
+			takeown /f $0409Folder /r /d y
+			CMD /C "icacls $0409Folder /grant BUILTIN\ADMINISTRATORS:(OI)(CI)F"
+			
+			Push-Location $0409Folder
+			Get-ChildItem * -Recurse | Remove-Item
+			Pop-Location
+
+			Write-Output "$0409Folder deleted"
+		
+		}
+		
+		Push-Location $adminScriptsFolder
+		Get-ChildItem * -Recurse | Remove-Item
+		Pop-Location
+
+		Remove-Item $adminScriptsFolder -Recurse
+		
+		Write-Output "$0409Folder deleted"
+		
+	}
+
+	else {
+
+		Write-Output "STIG Compliant - $adminScriptsFolder does not exist"
+	
+	}
+
+	# Delete Sample folder #
+
+	if (Test-Path $sampleFolder) {
+		
+		Write-Output "$sampleFolder folder exists - please delete"
+	
+	}
+	else {
+	
+		Write-Output "$sampleFolder does not exist"
+	
+	}
+
+	# Delete MSADC folder #
+
+	if (Test-Path $msadcFolder) {
+		
+		Write-Output "Not STIG compliant - $msadcFolder folder exists - deleting"
+		
+		Set-Location "C:\Program Files\Common Files\System\"
+		
+		takeown /f msadc /r /d y
+		icacls msadc /grant Administrators:f /t /q
+		Remove-Item $msadcFolder -recurse
+		
+		Write-Output "Deleted $msadcFolder"
+		
+	}
+	
+	else {
+	
+		Write-Output "STIG compliant - $msadcFolder does not exist"
+	
+	}
 
 }
