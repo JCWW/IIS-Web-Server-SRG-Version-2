@@ -120,10 +120,9 @@ function Set-LogDataFields {
 	Write-Output "`n ----- Applying V-41617 from Web Server Security Requirements Guide -----"
 	Write-Output "`n ----- Applying V-41620 from Web Server Security Requirements Guide -----"
 	Write-Output "`n ----- Applying V-56021 from Web Server Security Requirements Guide -----"
-	 
 
-	Set-WebConfigurationProperty "/system.applicationHost/sites/siteDefaults" -name logfile.logExtFileFlags -value "Date,Time,ClientIP,UserName,ServerIP,Method,UriStem,UriQuery,HttpStatus,Win32Status,TimeTaken,ServerPort,UserAgent,Referer,HttpSubStatus"
-	
+	Set-WebConfigurationProperty "/system.applicationHost/sites/siteDefaults"  -name logfile.logExtFileFlags -value "Date,Time,ClientIP,UserName,SiteName,ServerIP,Method,UriStem,UriQuery,HttpStatus,Win32Status,TimeTaken,ServerPort,UserAgent,Cookie,Referer,HttpSubStatus"
+
 	Write-Output "`Configured IIS logs per STIG guidelines"
 }
 
@@ -686,6 +685,33 @@ function Set-V56003 {
 	
 	Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST'  -filter "system.webServer/security/access" -name "sslFlags" -value "Ssl128"
 }
+ 
+function Set-V56005{
+
+ <#
+	.SYNOPSIS
+	Applies finding V-56005 ("Web server cookies, such as session cookies, sent to the client using SSL/TLS must not be compressed.") from the Web Server STIG.
+	.DESCRIPTION
+	Configure the web server to encrypt the session identifier for transmission to the client. 
+	Set-V56005
+	.COMPONENT
+	IIS Web Server
+	.LINK
+	http://iase.disa.mil/stigs/app-security/web-servers/Pages/index.aspx
+	.LINK
+	  http://iasecontent.disa.mil/stigs/zip/Oct2015/U_Web_Server_V2R2_SRG.zip
+	.LINK
+	  https://www.stigviewer.com/stig/web_server_security_requirements_guide/2014-11-17/finding/V-56005
+	#>
+
+	Write-Output "`n ----- Applying V-56003 from Web Server Security Requirements Guide -----"
+	Write-Output "`n -----Setting Session State to 'In Proc' mode. -----"
+
+	$serverConfiguration = "/system.web/sessionState"
+
+	Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT'  -filter $serverConfiguration -name "mode" -value "InProc"
+
+}
 
 function Set-V56007 {
 
@@ -712,16 +738,14 @@ function Set-V56007 {
 	
 }
 
-function Set-V56009 {
+function Set-V56009{
 
-<#
+ <#
 	.SYNOPSIS
 	Applies finding V-56009 ("Cookies exchanged between the web server and the client, such as session cookies, must have cookie properties set to force the encryption of cookies.") from the Web Server STIG.
 	.DESCRIPTION
-	Cookies exchanged between the web server and the client, such as session cookies, must have cookie properties set to force the encryption of cookies.
-	 .PARAMETER Limit
-	Optional. Configures the maximum idle time in minutes. Default is 20. 
-	Set-V56009
+	Configure the web server to encrypt cookies before transmission.
+	Set-V56005
 	.COMPONENT
 	IIS Web Server
 	.LINK
@@ -731,11 +755,12 @@ function Set-V56009 {
 	.LINK
 	  https://www.stigviewer.com/stig/web_server_security_requirements_guide/2014-11-17/finding/V-56009
 	#>
-	
-  Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT'  -filter "system.web/httpCookies" -name "requireSSL" -value "True"
-	
+
+	Write-Output "`n ----- Applying V-56009 from Web Server Security Requirements Guide -----"
+
+	Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT'  -filter "system.web/httpCookies" -name "requireSSL" -value "True"
 }
- 
+
 function Set-V56011 {
 
 <#
@@ -813,6 +838,30 @@ function Set-V56017 {
 
 }
 
+
+function Set-V56021 {
+
+	<#
+	.SYNOPSIS
+	Applies findingV-56021 ("Rule Title: The web server must invalidate session identifiers upon hosted application user logout or other session termination.") from the Web Server STIG.
+	.DESCRIPTION
+	Configure the web server to invalidate session identifiers when a session is terminated.
+	Set-V56023
+	.COMPONENT
+	IIS Web Server
+	.LINK
+	http://iase.disa.mil/stigs/app-security/web-servers/Pages/index.aspx
+	.LINK
+	http://iasecontent.disa.mil/stigs/zip/Oct2015/U_Web_Server_V2R2_SRG.zip
+	.LINK
+	https://www.stigviewer.com/stig/web_server_security_requirements_guide/2014-11-17/finding/V-56021
+	#>
+	
+	Write-Output "`n ----- Applying V-56021 from Web Server Security Requirements Guide -----"
+
+	
+}
+
 function Set-V56023 {
 
 	<#
@@ -853,7 +902,7 @@ function Set-V56025 {
 	https://www.stigviewer.com/stig/web_server_security_requirements_guide/2014-11-17/finding/V-56025
 	#>
 	
-Write-Output "`n ----- Applying V-56025 from Web Server Security Requirements Guide -----"
+	Write-Output "`n ----- Applying V-56025 from Web Server Security Requirements Guide -----"
 	Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT'  -filter "system.web/machineKey" -name "decryptionKey" -value "AutoGenerate,IsolateApps"
 	Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT'  -filter "system.web/machineKey" -name "validationKey" -value "AutoGenerate,IsolateApps"
 }

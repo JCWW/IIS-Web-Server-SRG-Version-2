@@ -58,7 +58,11 @@ Write-Output "`n ----- Applying Web Server Security Requirements Guide: Release 
 
 #Set-GISAV56003
 
+#Set-GISAV56005
+
 #Set-GISAV56007
+
+#Set-GISAV56009
 
 #Set-GISAV56011
 
@@ -70,6 +74,8 @@ Write-Output "`n ----- Applying V-56017 from Web Server Security Requirements Gu
 #Set-V56017
 
 #Set-GISAV56023
+
+#Set-GISAV56025
 
 #Set-GISAV56035
 
